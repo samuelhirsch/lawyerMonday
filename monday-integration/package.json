@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec \"node --use-system-ca\" express.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --exec \"node --use-system-ca\" express.js",
+    "start": "node express.js",
+    "test": "node --check express.js && node --check getColumns.js && node --check generatePDF.js && node --check sendEmail.js && node --check logError.js"
   },
   "keywords": [],
   "author": "",

@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import fs from "fs";
+
 export default async function sendEmail(toEmail, pdfPath) {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -17,7 +17,7 @@ export default async function sendEmail(toEmail, pdfPath) {
     attachments: [
       {
         filename: "contract.pdf",
-        path: `./${pdfPath}`,
+        path: pdfPath,
       },
     ],
   });

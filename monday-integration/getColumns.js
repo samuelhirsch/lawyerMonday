@@ -1,9 +1,11 @@
 import { ApiClient } from "@mondaydotcomorg/api";
 
+
 export default async function getColumns(itemId) {
   const client = new ApiClient({
     token: process.env.MONDAY_API_TOKEN,
   });
+ 
   const query = `
       query ($itemId: [ID!]) {
         items(ids: $itemId) {
@@ -26,18 +28,28 @@ export default async function getColumns(itemId) {
   const response = await client.request(query, variables);
 
   const item = response.items?.[0] || response.data?.items?.[0];
-  //let itemcolumnname=item.column_values[3].column.title;
-  //console.log("this", itemcolumnname);
+  if (!item) {
+    throw new Error(`Monday item not found for itemId ${itemId ?? "unknown"}`);
+  }
+  if (!Array.isArray(item.column_values)) {
+    throw new Error(`Monday item ${itemId ?? "unknown"} returned invalid column data`);
+  }
   const cleanData = {
     name: item.name,
   };
 
   item.column_values.forEach(col => {
-    const cleanKey = col.column.title.toLowerCase()
-    cleanData[cleanKey] = col.text;
+    if (!col?.column?.title) {
+      return;
+    }
+    const cleanKey = col.column.title.toLowerCase();
+    cleanData[cleanKey] = col.text ?? "";
   });
 
-  console.log("CLEAN DATA:");
-  console.log(cleanData);
+  console.log("Loaded Monday item data", {
+    name: cleanData.name,
+    hasEmail: Boolean(cleanData.email),
+    fieldCount: Object.keys(cleanData).length,
+  });
   return cleanData;
 }
